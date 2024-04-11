@@ -1,0 +1,95 @@
+@charset "UTF-8";
+
+:root {
+  --navbar-height: 4rem;
+}
+
+body {
+  overflow-x: hidden;
+  font-family: "Montserrat", sans-serif;
+}
+
+main {
+  margin-top: var(--navbar-height);
+  width: 100vw;
+  height: calc(100vh - var(--navbar-height));
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+button, #tripNameInput, .location-input {
+  font-weight: 600 !important;
+}
+
+label {
+  font-weight: 500;
+}
+
+ins, small, ::placeholder {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.navbar {
+  height: var(--navbar-height);
+}
+
+.navbar-brand {
+  font-family: "Aclonica", sans-serif;
+  font-size: 1.6rem;
+}
+
+#navbarCollapse {
+  background-color: #212529;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+}
+
+.offcanvas-header {
+  border-bottom: 1px solid #aababc;
+}
+
+.stop-card {
+  cursor: move;
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  border-top-width: 1px !important;
+  border-radius: inherit;
+  margin-bottom: 0.75rem;
+}
+
+.stop-card:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.edit-placeholder {
+  color: #d3d3d3;
+}
+
+.duration-picker-input input {
+  width: 3.5rem;
+  line-height: 0.5rem;
+}
+
+.duration-picker-block {
+  display: inline-flex;
+  text-align: center;
+  padding-right: 0.25rem;
+}
+
+.leaflet-control-container .leaflet-routing-container {
+  display: none;
+}
+
+#summary {
+  z-index: 1040;
+  left: 12px;
+  bottom: 12px;
+  width: 25rem;
+  max-width: calc(100vw - 24px);
+}

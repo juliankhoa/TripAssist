@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Review and manage saved trips">
+  <meta name="author" content="">
+  <title>Trip Assist | Saved Trips</title>
+  <!-- Favicon-->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.png" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!-- Core CSS (Bootstrap) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+  <!-- Core CSS -->
+  <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<template id="tripCardTemplate">
+  <div title="###" class="trip-card col">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <!-- Trip name -->
+        <h3 class="mb-0">Trip Name</h3>
+        <!-- Trip start date/time -->
+        <label class="lead mb-2">16 January, 2025 8:00 AM</label>
+        <table class="table table-sm">
+          <tbody>
+            <!-- Trip stops go here -->
+          </tbody>
+        </table>
+        <!-- Trip summary -->
+        <p class="figure-caption mb-2">
+          <ins class="trip-distance">50 mi</ins> &thinsp; | &thinsp;
+          <ins class="trip-duration">8 hours</ins>
+        </p>
+        <!-- Trip description -->
+        <p class="card-text">Description text!</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="last-changed text-muted">3 hours ago</small>
+          <div class="btn-group">
+            <!-- Open button -->
+            <button type="button" class="btn btn-primary" title="Open" onclick="openTrip($(this))">
+              <i class="fa-solid fa-arrow-up-right-from-square fa-fw"></i>
+            </button>
+            <!-- Delete button -->
+            <button type="button" class="btn btn-danger" title="Delete" onclick="openDeleteMenu($(this))">
+              <i class="fa-solid fa-trash-can fa-fw"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+      <!-- Navigation bar -->
+      <a class="navbar-brand mx-3" href="planner.html"><img src="assets/favicon.png" height="38" />TripAssist</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item"><a class="nav-link" href="planner.html">Trip Planner</a></li>
+          <li class="nav-item"><a class="nav-link active" href="saved-trips.html">Saved Trips</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Header -->
+    <section class="py-5 text-center container">
+      <div class="row">
+        <div class="col-lg-6 col-md-8 mx-auto">
+          <h2>Saved Trips</h2>
+          <p class="lead text-muted">Trips saved from the <a href="planner.html">Trip Planner</a> can be reviewed and managed here.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="py-5 bg-light" style="min-height: 50vh">
+      <div class="container">
+        <!-- Empty saves message -->
+        <div id="emptySavesMessage" style="display: none">
+          <div class="d-flex justify-content-center">
+            <p class="lead">Nothing here! Try creating and saving a new trip.</p>
+          </div>
+          <!-- Trip planner link button -->
+          <div class="d-flex justify-content-center">
+            <a href="planner.html"><button href="planner.html" class="btn btn-primary"><i class="fa-solid fa-plus fa-fw"></i> Create New Trip</button></a>
+          </div>
+        </div>
+        <div id="tripsList" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+          <!-- Saved trips go here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete trip modal -->
+  <div id="deleteModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Delete <i id="deleteTripName">Trip</i>?</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" onclick="deleteTrip()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Font Aweseome Icons -->
+  <script src="https://kit.fontawesome.com/ec90448266.js" crossorigin="anonymous"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+  <!-- jQuery UI -->
+  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+  <!-- Bootstrap core JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <!-- Core JS-->
+  <script src="js/utils.js"></script>
+  <script src="js/saved-trips.js"></script>
+</body>
+
+</html>
