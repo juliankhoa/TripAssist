@@ -8,15 +8,17 @@ function loadTripSaves() {
   for (var i = 0; i < localStorage.length; i++) {
     let tripName = localStorage.key(i);
     let tripData = JSON.parse(localStorage.getItem(tripName));
-    tripsList.push({
-      dateLastChanged: tripData.dateLastChanged,
-      name: tripName,
-      description: tripData.description,
-      startDateTime: tripData.startDateTime,
-      itinerary: tripData.itinerary,
-      totalDistance: tripData.totalDistance,
-      totalDuration: tripData.totalDuration
-    });
+    if (tripData.hasOwnProperty('itinerary')) {
+      tripsList.push({
+        dateLastChanged: tripData.dateLastChanged,
+        name: tripName,
+        description: tripData.description,
+        startDateTime: tripData.startDateTime,
+        itinerary: tripData.itinerary,
+        totalDistance: tripData.totalDistance,
+        totalDuration: tripData.totalDuration
+      });
+    }
   }
   if (!tripsList.length) {
     $('#emptySavesMessage').show();
