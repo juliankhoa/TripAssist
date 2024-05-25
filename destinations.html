@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Trip Planner</title>
+  <!-- Favicon-->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.png" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aclonica&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+  <!-- Select2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+  <!-- Select2 Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous" />
+  <!-- Core CSS -->
+  <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<!-- Template for stops viewed in itinerary -->
+<template id="stopCardTemplate">
+  <a id="###" class="stop-card list-group-item list-group-item-action flex-column p-1">
+    <div class="row">
+      <div class="col-8">
+        <div class="d-flex">
+          <h5><i class="fa-solid fa-location-dot" style="color: #888"></i></h5>
+          <div class="px-2">
+            <!-- Location name display -->
+            <h5 class="stop-name display-field mb-0"><small class="text-muted">
+                <div class="spinner-border spinner-border-sm"></div> Loading...
+              </small>
+            </h5>
+            <!-- Location edit field -->
+            <div class="edit-field form-row" style="display: none">
+              <input class="location-input form-control form-control-sm" type="text" placeholder="Location" />
+            </div>
+            <!-- Location address display -->
+            <p class="text-muted lh-1 mb-1"><small class="address">Enter location name/address</small></p>
+          </div>
+        </div>
+
+        <!-- Travel duration display -->
+        <label>
+          <i class="fa-solid fa-car fa-fw"></i>: <ins class="travel-duration">
+            <i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i>
+          </ins> <small class="travel-distance"></small>
+        </label>
+      </div>
+
+      <div class="col-4">
+        <div class="btn-group float-end">
+          <!-- Edit button -->
+          <button type="button" class="edit-btn btn btn-primary btn-sm" title="Edit" onclick="enterEditMode($(this))">
+            <i class="fa-solid fa-pen fa-fw"></i>
+          </button>
+          <!-- Delete button -->
+          <button type="button" class="btn btn-danger btn-sm" title="Delete" onclick="deleteStop($(this))">
+            <i class="fa-solid fa-xmark fa-fw"></i>
+          </button>
+        </div>
+
+        <div class="weather float-end mt-2" style="display: none">
+          <div class="d-flex">
+            <!-- Weather icon -->
+            <h3 class="weather-icon"><i class="fa-solid fa-cloud-sun fa-fw"></i></h3>&ensp;
+            <!-- Temperature -->
+            <ins class="temperature"><i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i></ins>&ensp;
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Arrival time display -->
+      <label>Arrive: <ins class="arrive-time">
+          <i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i>
+        </ins></label>
+
+      <div class="d-flex">
+        <label><i class="fa-solid fa-stopwatch fa-fw"></i>:&nbsp;</label>
+        <!-- Stay duration display -->
+        <div class="display-field"><ins class="stay-duration">1 hour</ins></div>
+        <!-- Stay duration edit field -->
+        <div class="duration-picker-wrapper edit-field" style="display: none">
+          <input type="text" class="duration-picker form-control" value="3600">
+        </div>
+      </div>
+      <!-- Departure time display -->
+      <label>Leave: <ins class="leave-time">
+          <i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i>
+        </ins>
+      </label>
+
+    </div>
+  </a>
+</template>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+      <!-- Navigation bar -->
+      <a class="navbar-brand mx-3" href="planner.html"><img src="assets/favicon.png" height="38" />TripAssist</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item"><a class="nav-link" href="planner.html">Trip Planner</a></li>
+          <li class="nav-item"><a class="nav-link" href="saved-trips.html">Saved Trips</a></li>
+          <li class="nav-item"><a class="nav-link active" href="destinations.html">Destinations</a></li>
+        </ul>
+        <form class="d-flex">
+          <button id="showItineraryBtn" type="button" class="btn btn-primary text-uppercase" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+            <i class="fa-solid fa-list"></i> Destinations
+          </button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Map -->
+  <main id="map"></main>
+
+  <!-- Itinerary sidebar -->
+  <div id="sidebar" class="offcanvas offcanvas-end" data-bs-backdrop="false" style="width: 36rem">
+    <div class="offcanvas-header bg-light">
+      <div class="container">
+        <div class="row mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="btn btn-secondary" title="Hide" data-bs-dismiss="offcanvas"><i class="fa-solid fa-arrow-right"></i></button>
+            <h4 id="tripName" class="text-uppercase mt-2">All Destinations</h4>
+
+            <div class="dropdown">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-arrow-down-wide-short"></i></button>
+              <ul class="dropdown-menu">
+                <li class="dropdown-item" style=""><i class="fa-solid fa-arrow-down-a-z fa-fw"></i> Name <span class="text-muted">(A–Z)<span></li>
+                <li class="dropdown-item"><i class="fa-solid fa-arrow-up-a-z fa-fw"></i> Name <span class="text-muted">(Z–A)<span></li>
+                <li class="dropdown-item"><i class="fa-solid fa-location-dot fa-fw"></i> Visited</li>
+                <li class="dropdown-item"><i class="fa-solid fa-location-pin-lock fa-fw"></i> Unvisited</li>
+              </ul>
+            </div>
+
+
+          </div>
+        </div>
+        <div class="row">
+
+          <div class="input-group">
+
+            <div class="dropdown">
+              <button type="button" class="filter-btn btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-globe fa-fw"></i></button>
+              <ul class="dropdown-menu">
+                <li class="dropdown-item" onclick="updateCountries(null)"><i class="fa-solid fa-globe fa-fw"></i> All Continents</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li class="dropdown-item" onclick="updateCountries('Americas')"><i class="fa-solid fa-earth-americas fa-fw"></i> Americas</li>
+                <li class="dropdown-item" onclick="updateCountries('Europe')"><i class="fa-solid fa-earth-europe fa-fw"></i> Europe</li>
+                <li class="dropdown-item" onclick="updateCountries('Asia')"><i class="fa-solid fa-earth-asia fa-fw"></i> Asia</li>
+                <li class="dropdown-item" onclick="updateCountries('Oceania')"><i class="fa-solid fa-earth-oceania fa-fw"></i> Oceania</li>
+                <li class="dropdown-item" onclick="updateCountries('Africa')"><i class="fa-solid fa-earth-africa fa-fw"></i> Africa</li>
+              </ul>
+            </div>
+
+            <select id="countrySelect" class="form-select form-control" multiple>
+              <!-- Countries go here -->
+            </select>
+
+          </div>
+
+          <div class="input-group mt-3">
+
+            <div class="dropdown">
+              <button type="button" class="filter-btn btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-layer-group fa-fw"></i></button>
+              <ul class="dropdown-menu">
+                <li class="dropdown-item" onclick="updateTags(null)"><i class="fa-solid fa-layer-group fa-fw"></i> All Categories</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li class="dropdown-item" onclick="updateTags('Cultural')"><i class="fa-solid fa-landmark fa-fw"></i> Cultural</li>
+                <li class="dropdown-item" onclick="updateTags('Natural')"><i class="fa-solid fa-leaf fa-fw"></i> Natural</li>
+              </ul>
+            </div>
+
+            <select id="tagsSelect" class="form-select form-control" multiple>
+
+            </select>
+
+          </div>
+          
+      </div>
+    </div>
+    <div class="offcanvas-body">
+      <div id="itinerary" class="list-group">
+        <!-- Trip stops go here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Save trip modal -->
+  <div id="saveModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 id="saveModalTitle" class="modal-title">Save new trip</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-floating mb-3">
+              <input id="tripNameInput" type="text" class="trip-name-form form-control" placeholder="Trip Name">
+              <label class="trip-name-form" for="tripNameInput">Trip name</label>
+            </div>
+            <div class="form-floating">
+              <textarea id="tripDescriptionInput" type="text" class="form-control" placeholder="Description" style="height: 100px" maxlength="160"></textarea>
+              <label for="tripDescriptionInput">Description</label>
+            </div>
+          </form>
+          <p id="saveSuccess" class="mt-3 mb-0"><i class="fa-solid fa-check text-success"></i> View in <a href="saved-trips.html">Saved Trips</a></p>
+          <p id="saveWarning" class="mt-3 mb-0"><i class="fa-solid fa-triangle-exclamation text-warning"></i> Trip named <i class="trip-name">New Trip</i> already exists!</p>
+        </div>
+        <div class="modal-footer">
+          <button id="saveModalCancelBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="saveTripBtn" type="button" class="btn btn-primary" onclick="saveTrip()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Font Aweseome Icons -->
+  <script src="https://kit.fontawesome.com/ec90448266.js" crossorigin="anonymous"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+  <!-- jQuery UI -->
+  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+  <!-- Bootstrap 5 JS-->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <!-- Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.full.min.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+  <!-- Core JS-->
+  <script src="js/utils.js"></script>
+  <script src="js/countries.js"></script>
+  <script src="js/destinations.js"></script>
+</body>
+
+</html>

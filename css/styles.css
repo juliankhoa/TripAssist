@@ -93,3 +93,17 @@ ins, small, ::placeholder {
   width: 25rem;
   max-width: calc(100vw - 24px);
 }
+
+.filter-btn {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.select2-selection {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.img-flag {
+  width: 32px;
+}
