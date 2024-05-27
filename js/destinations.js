@@ -1,5 +1,6 @@
-const CULTURAL_TAGS = ['monument', 'palace', 'castle', 'fort', 'archaeological', 'town', 'bridge', 'place of worship', 'church', 'mosque', 'temple', 'shrine', 'synagogue'];
-const NATURAL_TAGS = ['park', 'trail', 'forest', 'mountain', 'lake', 'beach', 'desert', 'rock formation', 'cave', 'glacier', 'volcano', 'wildlife'];
+const COMMON_TAGS = ['heritage site', 'scenic point'];
+const CULTURAL_TAGS = ['monument', 'palace', 'archaeological site', 'architecture', 'bridge', 'castle', 'fort', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
+const NATURAL_TAGS = ['beach', 'cave', 'desert', 'forest', 'glacier', 'lake', 'mountain', 'park', 'rock formation', 'trail', 'volcano', 'wildlife'];
 
 var map = L.map('map').setView([20, 20], 3);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -33,6 +34,9 @@ function formatCountry(country) {
 
 // Update country filter
 function updateCountries(continent) {
+  let icon = continent == null ? 'globe' : 'earth-' + continent.toLowerCase();
+  $('#continentSelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
+
   let countrySelect = $('#countrySelect');
   countrySelect.empty();
   $.each(COUNTRIES, function(idx, country) {
@@ -44,18 +48,33 @@ function updateCountries(continent) {
 
 // Update tags filter
 function updateTags(category) {
+  let icon;
+  switch (category) {
+    case 'Cultural':
+      icon = 'landmark';
+      break;
+    case 'Natural':
+      icon = 'leaf';
+      break;
+    default:
+      icon = 'layer-group';
+  }
+  $('#categorySelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
+
   let tagsSelect = $('#tagsSelect');
   tagsSelect.empty();
 
+  let tags = COMMON_TAGS;
   if (category == 'Cultural' || category == null) {
-    $.each(CULTURAL_TAGS, function(idx, tag) {
-      tagsSelect.append(`<option value="${tag}">${tag}</option>`);
-    });
+    tags = tags.concat(CULTURAL_TAGS);
   }
 
   if (category == 'Natural' || category == null) {
-    $.each(NATURAL_TAGS, function(idx, tag) {
-      tagsSelect.append(`<option value="${tag}">${tag}</option>`);
-    });
+    tags = tags.concat(NATURAL_TAGS);
   }
+  tags.sort();
+
+  $.each(tags, function(idx, tag) {
+    tagsSelect.append(`<option value="${tag}">${tag}</option>`);
+  });
 }
