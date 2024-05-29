@@ -25,81 +25,25 @@
   <link href="css/styles.css" rel="stylesheet" />
 </head>
 
-<!-- Template for stops viewed in itinerary -->
-<template id="stopCardTemplate">
-  <a id="###" class="stop-card list-group-item list-group-item-action flex-column p-1">
-    <div class="row">
-      <div class="col-8">
-        <div class="d-flex">
-          <h5><i class="fa-solid fa-location-dot" style="color: #888"></i></h5>
-          <div class="px-2">
-            <!-- Location name display -->
-            <h5 class="stop-name display-field mb-0"><small class="text-muted">
-                <div class="spinner-border spinner-border-sm"></div> Loading...
-              </small>
-            </h5>
-            <!-- Location edit field -->
-            <div class="edit-field form-row" style="display: none">
-              <input class="location-input form-control form-control-sm" type="text" placeholder="Location" />
-            </div>
-            <!-- Location address display -->
-            <p class="text-muted lh-1 mb-1"><small class="address">Enter location name/address</small></p>
-          </div>
-        </div>
-
-        <!-- Travel duration display -->
-        <label>
-          <i class="fa-solid fa-car fa-fw"></i>: <ins class="travel-duration">
-            <i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i>
-          </ins> <small class="travel-distance"></small>
-        </label>
-      </div>
-
-      <div class="col-4">
-        <div class="btn-group float-end">
-          <!-- Edit button -->
-          <button type="button" class="edit-btn btn btn-primary btn-sm" title="Edit" onclick="enterEditMode($(this))">
-            <i class="fa-solid fa-pen fa-fw"></i>
-          </button>
-          <!-- Delete button -->
-          <button type="button" class="btn btn-danger btn-sm" title="Delete" onclick="deleteStop($(this))">
-            <i class="fa-solid fa-xmark fa-fw"></i>
-          </button>
-        </div>
-
-        <div class="weather float-end mt-2" style="display: none">
-          <div class="d-flex">
-            <!-- Weather icon -->
-            <h3 class="weather-icon"><i class="fa-solid fa-cloud-sun fa-fw"></i></h3>&ensp;
-            <!-- Temperature -->
-            <ins class="temperature"><i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i></ins>&ensp;
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Arrival time display -->
-      <label>Arrive: <ins class="arrive-time">
-          <i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i>
-        </ins></label>
-
-      <div class="d-flex">
-        <label><i class="fa-solid fa-stopwatch fa-fw"></i>:&nbsp;</label>
-        <!-- Stay duration display -->
-        <div class="display-field"><ins class="stay-duration">1 hour</ins></div>
-        <!-- Stay duration edit field -->
-        <div class="duration-picker-wrapper edit-field" style="display: none">
-          <input type="text" class="duration-picker form-control" value="3600">
+<!-- Template for destinations -->
+<template id="destinationCardTemplate">
+  <div id="###" class="list-group-item flex-column p-1">
+    <img src="https://a.travel-assets.com/findyours-php/viewfinder/images/res70/241000/241460-Yosemite-National-Park.jpg" class="destination-img rounded mb-2">
+    <div class="d-flex">
+      <h5><i class="fa-solid fa-location-dot" style="color: #888"></i></h5>
+      <div class="px-2">
+        <!-- Location name display -->
+        <h5 class="stop-name display-field mb-1">Destination Name</h5>
+        <!-- Location address display -->
+        <p class="text-muted lh-1 mb-2"><small class="address">California, United States</small></p>
+        <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis augue nec ligula ultricies, quis scelerisque nibh venenatis.</p>
+        <div class="tags-section">
+          <!-- Tags go here -->
+          <span class="badge bg-secondary">park</span> <span class="badge bg-secondary">mountain</span>
         </div>
       </div>
-      <!-- Departure time display -->
-      <label>Leave: <ins class="leave-time">
-          <i class="fa-regular fa-pen-to-square edit-placeholder"><b>...</b></i>
-        </ins>
-      </label>
-
     </div>
-  </a>
+  </div>
 </template>
 
 <body>
@@ -135,7 +79,7 @@
         <div class="row mb-3">
           <div class="d-flex justify-content-between align-items-center">
             <button type="button" class="btn btn-secondary" title="Hide" data-bs-dismiss="offcanvas"><i class="fa-solid fa-arrow-right"></i></button>
-            <h4 id="tripName" class="text-uppercase mt-2">All Destinations</h4>
+            <h4 id="destinationsHeader" class="text-uppercase mt-2">All Destinations</h4>
 
             <div class="dropdown">
               <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-arrow-down-wide-short"></i></button>
@@ -157,15 +101,15 @@
             <div class="dropdown">
               <button id="continentSelect" type="button" class="filter-btn btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-globe fa-fw"></i></button>
               <ul class="dropdown-menu">
-                <li class="dropdown-item" onclick="updateCountries(null)"><i class="fa-solid fa-globe fa-fw"></i> All Continents</a></li>
+                <li class="dropdown-item" onclick="updateContinent(null)"><i class="fa-solid fa-globe fa-fw"></i> All Continents</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
-                <li class="dropdown-item" onclick="updateCountries('Americas')"><i class="fa-solid fa-earth-americas fa-fw"></i> Americas</li>
-                <li class="dropdown-item" onclick="updateCountries('Europe')"><i class="fa-solid fa-earth-europe fa-fw"></i> Europe</li>
-                <li class="dropdown-item" onclick="updateCountries('Asia')"><i class="fa-solid fa-earth-asia fa-fw"></i> Asia</li>
-                <li class="dropdown-item" onclick="updateCountries('Oceania')"><i class="fa-solid fa-earth-oceania fa-fw"></i> Oceania</li>
-                <li class="dropdown-item" onclick="updateCountries('Africa')"><i class="fa-solid fa-earth-africa fa-fw"></i> Africa</li>
+                <li class="dropdown-item" onclick="updateContinent('Americas')"><i class="fa-solid fa-earth-americas fa-fw"></i> Americas</li>
+                <li class="dropdown-item" onclick="updateContinent('Europe')"><i class="fa-solid fa-earth-europe fa-fw"></i> Europe</li>
+                <li class="dropdown-item" onclick="updateContinent('Asia')"><i class="fa-solid fa-earth-asia fa-fw"></i> Asia</li>
+                <li class="dropdown-item" onclick="updateContinent('Oceania')"><i class="fa-solid fa-earth-oceania fa-fw"></i> Oceania</li>
+                <li class="dropdown-item" onclick="updateContinent('Africa')"><i class="fa-solid fa-earth-africa fa-fw"></i> Africa</li>
               </ul>
             </div>
 
@@ -178,14 +122,14 @@
           <div class="input-group mt-3">
 
             <div class="dropdown">
-              <button id="categorySelect" type="button" class="filter-btn btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-layer-group fa-fw"></i></button>
+              <button id="categorySelect" type="button" class="filter-btn btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-layer-group fa-fw"></i></button>
               <ul class="dropdown-menu">
-                <li class="dropdown-item" onclick="updateTags(null)"><i class="fa-solid fa-layer-group fa-fw"></i> All Categories</a></li>
+                <li class="dropdown-item" onclick="updateCategory(null)"><i class="fa-solid fa-layer-group fa-fw"></i> All Categories</a></li>
                 <li>
                   <hr class="dropdown-divider">
                 </li>
-                <li class="dropdown-item" onclick="updateTags('Cultural')"><i class="fa-solid fa-landmark fa-fw"></i> Cultural</li>
-                <li class="dropdown-item" onclick="updateTags('Natural')"><i class="fa-solid fa-leaf fa-fw"></i> Natural</li>
+                <li class="dropdown-item" onclick="updateCategory('Cultural')"><i class="fa-solid fa-landmark fa-fw"></i> Cultural</li>
+                <li class="dropdown-item" onclick="updateCategory('Natural')"><i class="fa-solid fa-leaf fa-fw"></i> Natural</li>
               </ul>
             </div>
 
@@ -195,43 +139,16 @@
 
           </div>
 
+        </div>
       </div>
     </div>
-    <div class="offcanvas-body">
-      <div id="itinerary" class="list-group">
-        <!-- Trip stops go here -->
-      </div>
-    </div>
-  </div>
 
-  <!-- Save trip modal -->
-  <div id="saveModal" class="modal fade">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 id="saveModalTitle" class="modal-title">Save new trip</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="form-floating mb-3">
-              <input id="tripNameInput" type="text" class="trip-name-form form-control" placeholder="Trip Name">
-              <label class="trip-name-form" for="tripNameInput">Trip name</label>
-            </div>
-            <div class="form-floating">
-              <textarea id="tripDescriptionInput" type="text" class="form-control" placeholder="Description" style="height: 100px" maxlength="160"></textarea>
-              <label for="tripDescriptionInput">Description</label>
-            </div>
-          </form>
-          <p id="saveSuccess" class="mt-3 mb-0"><i class="fa-solid fa-check text-success"></i> View in <a href="saved-trips.html">Saved Trips</a></p>
-          <p id="saveWarning" class="mt-3 mb-0"><i class="fa-solid fa-triangle-exclamation text-warning"></i> Trip named <i class="trip-name">New Trip</i> already exists!</p>
-        </div>
-        <div class="modal-footer">
-          <button id="saveModalCancelBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button id="saveTripBtn" type="button" class="btn btn-primary" onclick="saveTrip()">Save</button>
-        </div>
+    <div class="offcanvas-body">
+      <div id="destinationList" class="list-group">
+        <!-- Destinations go here -->
       </div>
     </div>
+
   </div>
 
   <!-- Font Aweseome Icons -->

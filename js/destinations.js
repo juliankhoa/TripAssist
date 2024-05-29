@@ -2,6 +2,8 @@ const COMMON_TAGS = ['heritage site', 'scenic point'];
 const CULTURAL_TAGS = ['monument', 'palace', 'archaeological site', 'architecture', 'bridge', 'castle', 'fort', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
 const NATURAL_TAGS = ['beach', 'cave', 'desert', 'forest', 'glacier', 'lake', 'mountain', 'park', 'rock formation', 'trail', 'volcano', 'wildlife'];
 
+const GOOGLE_SHEETS_FILE_ID = '1ugUmLCRYnuB5jk08WnjFauOQN81ZHBjqg4COVGVmp7Q';
+
 var map = L.map('map').setView([20, 20], 3);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   maxZoom: 20
@@ -10,8 +12,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
 $(function() {
   $('#showItineraryBtn').click();
 
-  updateCountries(null);
-  updateTags(null);
+  updateContinent(null);
+  updateCategory(null);
 
   $('#countrySelect').select2({
     placeholder: 'Select countries',
@@ -23,7 +25,21 @@ $(function() {
     placeholder: 'Select tags',
     theme: 'bootstrap-5'
   });
+
+  createDestinationCard('s');
 });
+
+var url = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEETS_FILE_ID}/gviz/tq?tqx=out:csv&sheet=Americas`;
+$.ajax({url: url, type: 'GET', dataType: 'text'})
+.done(function(csv) {
+  console.log(csv);
+})
+.fail((e) => console.log(e.status));
+
+function createDestinationCard(id) {
+  let template = $('#destinationCardTemplate').html();
+  $('#destinationList').append(template.replace('###', id));
+}
 
 function formatCountry(country) {
   if (!country.id) {
@@ -33,7 +49,9 @@ function formatCountry(country) {
 }
 
 // Update country filter
-function updateCountries(continent) {
+function updateContinent(continent) {
+  $('#destinationsHeader').html(continent == null ? 'All Destinations' : continent);
+
   let icon = continent == null ? 'globe' : 'earth-' + continent.toLowerCase();
   $('#continentSelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
 
@@ -47,19 +65,24 @@ function updateCountries(continent) {
 }
 
 // Update tags filter
-function updateTags(category) {
+function updateCategory(category) {
   let icon;
+  let btnClass;
   switch (category) {
     case 'Cultural':
       icon = 'landmark';
+      btnClass = 'primary';
       break;
     case 'Natural':
       icon = 'leaf';
+      btnClass = 'success';
       break;
     default:
       icon = 'layer-group';
+      btnClass = 'secondary';
   }
   $('#categorySelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
+  $('#categorySelect').removeClass('btn-primary btn-secondary btn-success').addClass('btn-' + btnClass);
 
   let tagsSelect = $('#tagsSelect');
   tagsSelect.empty();
