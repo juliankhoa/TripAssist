@@ -104,8 +104,19 @@ ins, small, ::placeholder {
   border-bottom-left-radius: 0 !important;
 }
 
-.img-flag {
+.select-flag {
   width: 24px;
+}
+
+.destination-card {
+  cursor: pointer;
+  border-top-width: 1px !important;
+  border-radius: inherit;
+  margin-bottom: 0.75rem;
+}
+
+.destination-card:hover {
+  background-color: #efefef;
 }
 
 .destination-img {
@@ -113,4 +124,18 @@ ins, small, ::placeholder {
   object-position: center top;
   width: 100%;
   height: 16rem;
+}
+
+.primary-flag {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 48px;
+}
+
+.secondary-flag {
+  position: absolute;
+  left: 60px;
+  top: 8px;
+  width: 48px;
 }

@@ -27,19 +27,20 @@
 
 <!-- Template for destinations -->
 <template id="destinationCardTemplate">
-  <div id="###" class="list-group-item flex-column p-1">
-    <img src="https://a.travel-assets.com/findyours-php/viewfinder/images/res70/241000/241460-Yosemite-National-Park.jpg" class="destination-img rounded mb-2">
+  <div id="###" class="destination-card list-group-item flex-column p-1">
+    <img src="" class="destination-img rounded mb-2">
+    <img src="" class="primary-flag">
+    <img src="" class="secondary-flag">
     <div class="d-flex">
       <h5><i class="fa-solid fa-location-dot" style="color: #888"></i></h5>
       <div class="px-2">
         <!-- Location name display -->
-        <h5 class="stop-name display-field mb-1">Destination Name</h5>
+        <h5 class="destination-name mb-1">Destination Name</h5>
         <!-- Location address display -->
-        <p class="text-muted lh-1 mb-2"><small class="address">California, United States</small></p>
-        <p class="mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis augue nec ligula ultricies, quis scelerisque nibh venenatis.</p>
+        <p class="text-muted lh-1 mb-2"><small class="destination-location">City, Region</small></p>
+        <p class="destination-description mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis augue nec ligula ultricies, quis scelerisque nibh venenatis.</p>
         <div class="tags-section">
           <!-- Tags go here -->
-          <span class="badge bg-secondary">park</span> <span class="badge bg-secondary">mountain</span>
         </div>
       </div>
     </div>
@@ -86,8 +87,10 @@
               <ul class="dropdown-menu">
                 <li class="dropdown-item" style=""><i class="fa-solid fa-arrow-down-a-z fa-fw"></i> Name <span class="text-muted">(A–Z)<span></li>
                 <li class="dropdown-item"><i class="fa-solid fa-arrow-up-a-z fa-fw"></i> Name <span class="text-muted">(Z–A)<span></li>
-                <li class="dropdown-item"><i class="fa-solid fa-location-dot fa-fw"></i> Visited</li>
-                <li class="dropdown-item"><i class="fa-solid fa-location-pin-lock fa-fw"></i> Unvisited</li>
+                <li class="dropdown-item" style=""><i class="fa-solid fa-arrow-down-1-9 fa-fw"></i> Coordinates <span class="text-muted">(SW–NE)<span></li>
+                <li class="dropdown-item"><i class="fa-solid fa-arrow-up-1-9 fa-fw"></i> Coordinates <span class="text-muted">(NE–SW)<span></li>
+                <li class="dropdown-item" style=""><i class="fa-solid fa-flag-usa fa-fw"></i> Country <span class="text-muted">(# markers)<span></li>
+                <li class="dropdown-item"><i class="fa-solid fa-shuffle fa-fw"></i> Random</li>
               </ul>
             </div>
 
