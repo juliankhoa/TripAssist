@@ -2,7 +2,7 @@ const SPREADSHEET_ID = '1ugUmLCRYnuB5jk08WnjFauOQN81ZHBjqg4COVGVmp7Q';
 const API_KEY = 'AIzaSyAECjJcpTbhSc-1JYwnS2Qat-Z1CvPvGUE';
 
 const COMMON_TAGS = ['heritage site', 'scenic point'];
-const CULTURAL_TAGS = ['monument', 'palace', 'port', 'archaeological site', 'architecture', 'market', 'bridge', 'venue', 'garden', 'castle', 'fort', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
+const CULTURAL_TAGS = ['monument', 'palace', 'port', 'archaeological site', 'architecture', 'market', 'bridge', 'venue', 'garden', 'vineyard', 'castle', 'fort', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
 const NATURAL_TAGS = ['beach', 'cave', 'desert', 'oasis', 'canyon', 'cliff', 'crater', 'forest', 'glacier', 'lake', 'mountain', 'valley', 'fjord', 'park', 'rock formation', 'trail', 'volcano', 'wildlife', 'hot spring', 'waterfall', 'river', 'wetland'];
 
 var currentContinent = null;
@@ -34,10 +34,9 @@ $(function() {
 });
 
 function addWorldDestinations() {
-  addDestinationsByContinent('Asia');
-  // for (let continent of ['Americas', 'Europe', 'Asia', 'Oceania', 'Africa']) {
-  //   addDestinationsByContinent(continent);
-  // }
+  for (let continent of ['Americas', 'Europe', 'Asia', 'Oceania', 'Africa']) {
+    addDestinationsByContinent(continent);
+  }
 }
 
 
@@ -55,6 +54,10 @@ function addDestinationsByContinent(continent) {
   });
 }
 
+var COMMON_COLOR = '#6c757d';
+var CULTURAL_COLOR = '#0d6efd';
+var NATURAL_COLOR = '#198754';
+var MIXED_COLOR = '#137ba9';
 
 function createDestinationCard(id, name, location, countryName, description, tags, img) {
   let template = $('#destinationCardTemplate').html();
@@ -79,13 +82,13 @@ function createDestinationCard(id, name, location, countryName, description, tag
   });
   parent.find('.destination-location').html(locationStr);
 
-  let categoryColor = '#6c757d';
+  let categoryColor = COMMON_COLOR;
   let tagsSection = parent.find('.tags-section');
   for (let tag of tags.split(',')) {
     let badgeClass = 'secondary';
     if (CULTURAL_TAGS.includes(tag)) {
       badgeClass = 'primary'
-      categoryColor = '#0d6efd';
+      categoryColor = categoryColor == NATURAL_COLOR ? MIXED_COLOR : CULTURAL_COLOR;
 
       if (['church', 'mosque', 'synagogue', 'temple', 'shrine'].includes(tag)) {
         appendTag(tagsSection, 'place of worship', badgeClass);
@@ -93,7 +96,7 @@ function createDestinationCard(id, name, location, countryName, description, tag
 
     } else if (NATURAL_TAGS.includes(tag)) {
       badgeClass = 'success';
-      categoryColor = '#198754';
+      categoryColor = categoryColor == CULTURAL_COLOR ? MIXED_COLOR : NATURAL_COLOR;
     }
     appendTag(tagsSection, tag, badgeClass);
   }
@@ -151,8 +154,7 @@ function updateContinent(continent) {
   $('#destinationList').empty();
   if (continent == null) {
     addWorldDestinations();
-  }
-  else {
+  } else {
     addDestinationsByContinent(continent);
   }
 }
