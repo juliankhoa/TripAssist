@@ -2,8 +2,8 @@ const SPREADSHEET_ID = '1ugUmLCRYnuB5jk08WnjFauOQN81ZHBjqg4COVGVmp7Q';
 const API_KEY = 'AIzaSyAECjJcpTbhSc-1JYwnS2Qat-Z1CvPvGUE';
 
 const COMMON_TAGS = ['heritage site', 'scenic point'];
-const CULTURAL_TAGS = ['monument', 'palace', 'port', 'archaeological site', 'architecture', 'market', 'bridge', 'venue', 'garden', 'vineyard', 'castle', 'fort', 'plaza', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
-const NATURAL_TAGS = ['beach', 'cave', 'desert', 'oasis', 'canyon', 'cliff', 'crater', 'forest', 'glacier', 'lake', 'mountain', 'valley', 'fjord', 'park', 'rock formation', 'trail', 'volcano', 'wildlife', 'hot spring', 'waterfall', 'river', 'wetland'];
+const CULTURAL_TAGS = ['town', 'plaza', 'market', 'port', 'monument', 'palace', 'castle', 'fort', 'bridge', 'museum', 'venue', 'library', 'garden', 'vineyard', 'architecture', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'archaeological site', 'ruins'];
+const NATURAL_TAGS = ['park', 'trail', 'river', 'lake', 'beach', 'coast', 'waterfall', 'wetland', 'hot spring', 'oasis', 'desert', 'canyon', 'rock formation', 'cave', 'cliff', 'crater', 'mountain', 'valley', 'forest', 'glacier', 'fjord', 'volcano', 'wildlife'];
 
 const categoryTagMap = {
   'Cultural': CULTURAL_TAGS.sort(),
@@ -66,7 +66,7 @@ function addDestinationsByContinent(continent) {
 
         if (countryFilter.length && !countryFilter.includes(countryCode)) return;
 
-        let tagsArr = tags.split(',');
+        let tagsArr = tags.split(',').sort();
         if (!tagsFilter.length) tagsFilter = categoryTagMap[currentCategory];
         if (!tagsFilter.some(t => tagsArr.includes(t))) return;
 
@@ -113,12 +113,8 @@ function createDestinationCard(id, name, location, countryCode, description, tag
     if (CULTURAL_TAGS.includes(tag)) {
       isCultural = true;
       badgeClass = 'primary';
-
-      if (['church', 'mosque', 'synagogue', 'temple', 'shrine'].includes(tag)) {
-        appendTag(tagsSection, 'place of worship', badgeClass);
-      }
-
-    } else if (NATURAL_TAGS.includes(tag)) {
+    }
+    else if (NATURAL_TAGS.includes(tag)) {
       isNatural = true;
       badgeClass = 'success';
     }
@@ -128,11 +124,9 @@ function createDestinationCard(id, name, location, countryCode, description, tag
   let categoryColor = COMMON_COLOR;
   if (isCultural && isNatural) {
     categoryColor = MIXED_COLOR;
-  }
-  else if (isCultural) {
+  } else if (isCultural) {
     categoryColor = CULTURAL_COLOR;
-  }
-  else if (isNatural) {
+  } else if (isNatural) {
     categoryColor = NATURAL_COLOR;
   }
   parent.find('.fa-location-dot').css('color', categoryColor);
