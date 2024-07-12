@@ -23,9 +23,7 @@ var markerLayer = L.layerGroup().addTo(map);
 
 $(function() {
   $('#showItineraryBtn').click();
-
   updateContinent(null);
-  updateCategory(null);
 
   $('#countrySelect').select2({
     placeholder: 'Select countries',
@@ -40,8 +38,8 @@ $(function() {
 });
 
 function updateDestinations() {
-  markerLayer.clearLayers();
   $('#destinationList').empty();
+  markerLayer.clearLayers();
 
   if (currentContinent == null) {
     for (let continent of ['Americas', 'Europe', 'Asia', 'Oceania', 'Africa']) {
@@ -172,7 +170,7 @@ function updateContinent(continent) {
   $('#continentSelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
 
   let countrySelect = $('#countrySelect');
-  countrySelect.val(null).trigger('change');
+  countrySelect.val(null);
 
   countrySelect.empty();
   $.each(COUNTRIES, function(idx, country) {
@@ -204,7 +202,7 @@ function updateCategory(category) {
   $('#categorySelect').removeClass('btn-primary btn-secondary btn-success').addClass('btn-' + btnClass);
 
   let tagsSelect = $('#tagsSelect');
-  tagsSelect.val(null).trigger('change');
+  tagsSelect.val(null);
 
   tagsSelect.empty();
   $.each(categoryTagMap[category], function(idx, tag) {
