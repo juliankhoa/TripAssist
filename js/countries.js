@@ -62,7 +62,7 @@ const COUNTRIES = [{
     name: 'Australia',
     code: 'AU',
     continent: 'Oceania',
-    territories: ['Norfolk Island', 'Christmas Island', 'Cocos (Keeling) Islands', 'Heard Island & McDonald Islands']
+    territories: ['NF', 'CX', 'CC', 'HM']
   },
   {
     name: 'Austria',
@@ -244,7 +244,7 @@ const COUNTRIES = [{
     name: 'China',
     code: 'CN',
     continent: 'Asia',
-    territories: ['Hong Kong', 'Macao', 'Tibet']
+    territories: ['HK', 'MO', 'CN-XZ']
   },
   {
     name: 'Christmas Island',
@@ -320,7 +320,7 @@ const COUNTRIES = [{
     name: 'Denmark',
     code: 'DK',
     continent: 'Europe',
-    territories: ['Faroe Islands', 'Greenland']
+    territories: ['FO', 'GL']
   },
   {
     name: 'Djibouti',
@@ -351,7 +351,7 @@ const COUNTRIES = [{
     name: 'Ecuador',
     code: 'EC',
     continent: 'Americas',
-    territories: ['Galápagos Islands']
+    territories: ['EC-W']
   },
   {
     name: 'Egypt',
@@ -418,7 +418,7 @@ const COUNTRIES = [{
     name: 'France',
     code: 'FR',
     continent: 'Europe',
-    territories: ['Réunion', 'Guadeloupe', 'Martinique', 'French Polynesia', 'French Guiana', 'French Southern Territories', 'Mayotte', 'New Caledonia', 'Saint Barthélemy', 'Saint Pierre & Miquelon', 'Corsica']
+    territories: ['RE', 'GP', 'MQ', 'PF', 'GF', 'TF', 'YT', 'NC', 'BL', 'PM', 'FR-20R']
   },
   {
     name: 'French Guiana',
@@ -594,7 +594,7 @@ const COUNTRIES = [{
     name: 'Italy',
     code: 'IT',
     continent: 'Europe',
-    territories: ['Sardinia', 'Sicily']
+    territories: ['IT-88', 'IT-82']
   },
   {
     name: 'Ivory Coast',
@@ -850,7 +850,7 @@ const COUNTRIES = [{
     name: 'Netherlands',
     code: 'NL',
     continent: 'Europe',
-    territories: ['Aruba', 'Curaçao', 'Sint Maarten', 'Bonaire', 'Saba', 'Sint Eustatius']
+    territories: ['AW', 'CW', 'SX', 'BQ-BO', 'BQ-SA', 'BQ-SE']
   },
   {
     name: 'New Caledonia',
@@ -861,7 +861,7 @@ const COUNTRIES = [{
     name: 'New Zealand',
     code: 'NZ',
     continent: 'Oceania',
-    territories: ['Cook Islands', 'Niue', 'Tokelau']
+    territories: ['CK', 'NU', 'TK']
   },
   {
     name: 'Nicaragua',
@@ -897,7 +897,7 @@ const COUNTRIES = [{
     name: 'Norway',
     code: 'NO',
     continent: 'Europe',
-    territories: ['Svalbard & Jan Mayen']
+    territories: ['SJ']
   },
   {
     name: 'Oman',
@@ -958,7 +958,7 @@ const COUNTRIES = [{
     name: 'Portugal',
     code: 'PT',
     continent: 'Europe',
-    territories: ['Madeira', 'Azores']
+    territories: ['PT-30', 'PT-20']
   },
   {
     name: 'Puerto Rico',
@@ -1124,7 +1124,7 @@ const COUNTRIES = [{
     name: 'Spain',
     code: 'ES',
     continent: 'Europe',
-    territories: ['Canary Islands', 'Ceuta', 'Balearic Islands', 'Melilla', 'Basque Country']
+    territories: ['ES-CN', 'ES-CE', 'ES-IB', 'ES-ML', 'ES-PV']
   },
   {
     name: 'Sri Lanka',
@@ -1250,13 +1250,13 @@ const COUNTRIES = [{
     name: 'United Kingdom',
     code: 'GB',
     continent: 'Europe',
-    territories: ['Anguilla', 'Bermuda', 'British Indian Ocean Territory', 'British Virgin Islands', 'Cayman Islands', 'Falkland Islands (Islas Malvinas)', 'Gibraltar', 'Montserrat', 'Pitcairn Islands', 'Turks & Caicos Islands', 'Guernsey', 'Isle of Man', 'Jersey', 'England', 'Scotland', 'Wales']
+    territories: ['AI', 'BM', 'IO', 'VG', 'KY', 'FK', 'GI', 'MS', 'PN', 'TC', 'GG', 'IM', 'JE', 'GB-ENG', 'GB-SCT', 'GB-WLS']
   },
   {
     name: 'United States',
     code: 'US',
     continent: 'Americas',
-    territories: ['American Samoa', 'Guam', 'Northern Mariana Islands', 'Puerto Rico', 'US Virgin Islands', 'US Minor Outlying Islands', 'Hawaii']
+    territories: ['AS', 'GU', 'MP', 'PR', 'VI', 'UM', 'US-HI']
   },
   {
     name: 'US Minor Outlying Islands',

@@ -2,8 +2,14 @@ const SPREADSHEET_ID = '1ugUmLCRYnuB5jk08WnjFauOQN81ZHBjqg4COVGVmp7Q';
 const API_KEY = 'AIzaSyAECjJcpTbhSc-1JYwnS2Qat-Z1CvPvGUE';
 
 const COMMON_TAGS = ['heritage site', 'scenic point'];
-const CULTURAL_TAGS = ['monument', 'palace', 'port', 'archaeological site', 'architecture', 'market', 'bridge', 'venue', 'garden', 'vineyard', 'castle', 'fort', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
+const CULTURAL_TAGS = ['monument', 'palace', 'port', 'archaeological site', 'architecture', 'market', 'bridge', 'venue', 'garden', 'vineyard', 'castle', 'fort', 'plaza', 'library', 'museum', 'place of worship', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'ruins', 'town'];
 const NATURAL_TAGS = ['beach', 'cave', 'desert', 'oasis', 'canyon', 'cliff', 'crater', 'forest', 'glacier', 'lake', 'mountain', 'valley', 'fjord', 'park', 'rock formation', 'trail', 'volcano', 'wildlife', 'hot spring', 'waterfall', 'river', 'wetland'];
+
+const categoryTagMap = {
+  'Cultural': CULTURAL_TAGS.sort(),
+  'Natural': NATURAL_TAGS.sort(),
+  'null': COMMON_TAGS.concat(CULTURAL_TAGS, NATURAL_TAGS).sort()
+};
 
 var currentContinent = null;
 var currentCategory = null;
@@ -25,29 +31,46 @@ $(function() {
     placeholder: 'Select countries',
     templateResult: formatCountry,
     theme: 'bootstrap-5'
-  });
+  }).on('change', updateDestinations);
 
   $('#tagsSelect').select2({
     placeholder: 'Select tags',
     theme: 'bootstrap-5'
-  });
+  }).on('change', updateDestinations);
 });
 
-function addWorldDestinations() {
-  for (let continent of ['Americas', 'Europe', 'Asia', 'Oceania', 'Africa']) {
-    addDestinationsByContinent(continent);
+function updateDestinations() {
+  markerLayer.clearLayers();
+  $('#destinationList').empty();
+
+  if (currentContinent == null) {
+    for (let continent of ['Americas', 'Europe', 'Asia', 'Oceania', 'Africa']) {
+      addDestinationsByContinent(continent);
+    }
+  } else {
+    addDestinationsByContinent(currentContinent);
   }
 }
 
 
 function addDestinationsByContinent(continent) {
+  let countryFilter = $('#countrySelect').val();
+  let tagsFilter = $('#tagsSelect').val();
+
   $.getJSON(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${continent}?alt=json&key=${API_KEY}`, function(json) {
     $.each(json.values, function(idx, row) {
       if (row.length) {
         let id = self.crypto.randomUUID();
-        let [name, coords, location, country, description, tags, img] = row;
-        if (!img) return;
-        let color = createDestinationCard(id, name, location, country, description, tags, img);
+        let [name, coords, location, countryCode, description, tags, imgUrl] = row;
+        if (!imgUrl) return;
+
+        if (countryFilter.length && !countryFilter.includes(countryCode)) return;
+
+        let tagsArr = tags.split(',');
+        if (!tagsFilter.length) tagsFilter = categoryTagMap[currentCategory];
+        if (!tagsFilter.some(t => tagsArr.includes(t))) return;
+
+        let color = createDestinationCard(id, name, location, countryCode, description, tagsArr, imgUrl);
         addDestinationMarker(id, name, color, coords);
       }
     });
@@ -59,46 +82,58 @@ var CULTURAL_COLOR = '#0d6efd';
 var NATURAL_COLOR = '#198754';
 var MIXED_COLOR = '#137ba9';
 
-function createDestinationCard(id, name, location, countryName, description, tags, img) {
+function createDestinationCard(id, name, location, countryCode, description, tagsArr, imgUrl) {
   let template = $('#destinationCardTemplate').html();
   $('#destinationList').prepend(template.replace('###', id));
 
   let parent = $('#' + id);
   parent.find('.destination-name').html(name);
   parent.find('.destination-description').html(description);
-  parent.find('.destination-img').attr('src', img);
+  parent.find('.destination-img').attr('src', imgUrl);
+  parent.find('.primary-flag').attr('src', `assets/flags/${countryCode}.png`);
 
-  let locationStr = location ? `${location}, ${countryName}` : countryName;
+  let countryName, sovereignName;
   $.each(COUNTRIES, function(idx, country) {
-    if (country.name == countryName) {
-      parent.find('.primary-flag').attr('src', `assets/flags/${country.code}.png`);
-    }
+    if (country.code == countryCode) countryName = country.name;
     if (country.territories) {
-      if (country.territories.includes(countryName)) {
+      if (country.territories.includes(countryCode)) {
         parent.find('.secondary-flag').attr('src', `assets/flags/${country.code}.png`);
-        locationStr += ' (' + country.name + ')';
+        sovereignName = country.name;
       }
     }
   });
+  if (sovereignName) countryName += ' (' + sovereignName + ')';
+  let locationStr = location ? `${location}, ${countryName}` : countryName;
   parent.find('.destination-location').html(locationStr);
 
-  let categoryColor = COMMON_COLOR;
+  let isCultural, isNatural = false;
   let tagsSection = parent.find('.tags-section');
-  for (let tag of tags.split(',')) {
+  for (let tag of tagsArr) {
     let badgeClass = 'secondary';
     if (CULTURAL_TAGS.includes(tag)) {
-      badgeClass = 'primary'
-      categoryColor = categoryColor == NATURAL_COLOR ? MIXED_COLOR : CULTURAL_COLOR;
+      isCultural = true;
+      badgeClass = 'primary';
 
       if (['church', 'mosque', 'synagogue', 'temple', 'shrine'].includes(tag)) {
         appendTag(tagsSection, 'place of worship', badgeClass);
       }
 
     } else if (NATURAL_TAGS.includes(tag)) {
+      isNatural = true;
       badgeClass = 'success';
-      categoryColor = categoryColor == CULTURAL_COLOR ? MIXED_COLOR : NATURAL_COLOR;
     }
     appendTag(tagsSection, tag, badgeClass);
+  }
+
+  let categoryColor = COMMON_COLOR;
+  if (isCultural && isNatural) {
+    categoryColor = MIXED_COLOR;
+  }
+  else if (isCultural) {
+    categoryColor = CULTURAL_COLOR;
+  }
+  else if (isNatural) {
+    categoryColor = NATURAL_COLOR;
   }
   parent.find('.fa-location-dot').css('color', categoryColor);
   return categoryColor;
@@ -143,27 +178,21 @@ function updateContinent(continent) {
   $('#continentSelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
 
   let countrySelect = $('#countrySelect');
+  countrySelect.val(null).trigger('change');
+
   countrySelect.empty();
   $.each(COUNTRIES, function(idx, country) {
     if (country.continent == continent || continent == null) {
       countrySelect.append(`<option value="${country.code}">${country.name}</option>`);
     }
   });
-
-  markerLayer.clearLayers();
-  $('#destinationList').empty();
-  if (continent == null) {
-    addWorldDestinations();
-  } else {
-    addDestinationsByContinent(continent);
-  }
+  updateDestinations();
 }
 
 // Update tags filter
 function updateCategory(category) {
   currentCategory = category;
-  let icon;
-  let btnClass;
+  let icon, btnClass;
   switch (category) {
     case 'Cultural':
       icon = 'landmark';
@@ -181,19 +210,11 @@ function updateCategory(category) {
   $('#categorySelect').removeClass('btn-primary btn-secondary btn-success').addClass('btn-' + btnClass);
 
   let tagsSelect = $('#tagsSelect');
+  tagsSelect.val(null).trigger('change');
+
   tagsSelect.empty();
-
-  let tags = COMMON_TAGS;
-  if (category == 'Cultural' || category == null) {
-    tags = tags.concat(CULTURAL_TAGS);
-  }
-
-  if (category == 'Natural' || category == null) {
-    tags = tags.concat(NATURAL_TAGS);
-  }
-  tags.sort();
-
-  $.each(tags, function(idx, tag) {
+  $.each(categoryTagMap[category], function(idx, tag) {
     tagsSelect.append(`<option value="${tag}">${tag}</option>`);
   });
+  updateDestinations();
 }
