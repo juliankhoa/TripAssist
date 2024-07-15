@@ -14,6 +14,8 @@ const categoryTagMap = {
 var currentContinent = null;
 var currentCategory = null;
 
+var markers = {};
+
 var map = L.map('map').setView([20, 20], 3);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
   maxZoom: 20
@@ -24,6 +26,7 @@ var markerLayer = L.layerGroup().addTo(map);
 $(function() {
   $('#showItineraryBtn').click();
   updateContinent(null);
+  updateCategory(null);
 
   $('#countrySelect').select2({
     placeholder: 'Select countries',
@@ -40,6 +43,7 @@ $(function() {
 function updateDestinations() {
   $('#destinationList').empty();
   markerLayer.clearLayers();
+  markers = {};
 
   if (currentContinent == null) {
     for (let continent of ['Americas', 'Europe', 'Asia', 'Oceania', 'Africa']) {
@@ -90,6 +94,10 @@ function createDestinationCard(id, name, location, countryCode, description, tag
   parent.find('.destination-img').attr('src', imgUrl);
   parent.find('.primary-flag').attr('src', `assets/flags/${countryCode}.png`);
 
+  parent.click(function() {
+    focusOnDestination(id);
+  });
+
   let countryName, sovereignName;
   $.each(COUNTRIES, function(idx, country) {
     if (country.code == countryCode) countryName = country.name;
@@ -137,7 +145,8 @@ function appendTag(tagsSection, tag, badgeClass) {
 
 function addDestinationMarker(id, name, color, coords) {
   let markerId = 'marker-' + id;
-  L.marker(coords.split(','), {
+  markers[id] = L.marker(coords.split(','), {
+    title: id,
     icon: L.divIcon({
       className: 'marker-icon',
       html: MARKER_SVG.replace('###', markerId),
@@ -147,11 +156,22 @@ function addDestinationMarker(id, name, color, coords) {
   }).bindTooltip(name, {
     direction: 'top',
     offset: L.point(0, -24)
-  }).addTo(markerLayer);
+  }).on('click', markerClick).addTo(markerLayer);
 
   $('#' + markerId).css({
     fill: color
   });
+}
+
+function markerClick(e) {
+  let id = $(e.sourceTarget || e.target)[0].options.title;
+  focusOnDestination(id);
+}
+
+function focusOnDestination(id) {
+  document.getElementById(id).scrollIntoView({behavior: 'smooth'});
+  let currentZoom = map.getZoom();
+  map.flyTo(markers[id].getLatLng(), Math.max(currentZoom, 8));
 }
 
 function formatCountry(country) {
