@@ -2,7 +2,7 @@ const SPREADSHEET_ID = '1ugUmLCRYnuB5jk08WnjFauOQN81ZHBjqg4COVGVmp7Q';
 const API_KEY = 'AIzaSyAECjJcpTbhSc-1JYwnS2Qat-Z1CvPvGUE';
 
 const COMMON_TAGS = ['heritage site', 'scenic point'];
-const CULTURAL_TAGS = ['town', 'plaza', 'market', 'port', 'monument', 'palace', 'castle', 'fort', 'bridge', 'museum', 'venue', 'library', 'garden', 'vineyard', 'architecture', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'archaeological site', 'ruins'];
+const CULTURAL_TAGS = ['town', 'plaza', 'market', 'port', 'monument', 'palace', 'castle', 'fort', 'bridge', 'museum', 'venue', 'library', 'garden', 'plantation', 'spa', 'architecture', 'church', 'mosque', 'synagogue', 'temple', 'shrine', 'archaeological site', 'ruins'];
 const NATURAL_TAGS = ['park', 'trail', 'river', 'lake', 'beach', 'coast', 'waterfall', 'wetland', 'hot spring', 'oasis', 'desert', 'canyon', 'rock formation', 'cave', 'cliff', 'crater', 'mountain', 'valley', 'forest', 'glacier', 'fjord', 'volcano', 'wildlife'];
 
 const categoryTagMap = {
@@ -145,7 +145,10 @@ function appendTag(tagsSection, tag, badgeClass) {
 
 function addDestinationMarker(id, name, color, coords) {
   let markerId = 'marker-' + id;
-  markers[id] = L.marker(coords.split(','), {
+  let coordsArr = coords.split(',').map(function(c) {
+    return c.trim();
+  });
+  markers[id] = L.marker(coordsArr, {
     title: id,
     icon: L.divIcon({
       className: 'marker-icon',
@@ -169,7 +172,9 @@ function markerClick(e) {
 }
 
 function focusOnDestination(id) {
-  document.getElementById(id).scrollIntoView({behavior: 'smooth'});
+  document.getElementById(id).scrollIntoView({
+    behavior: 'smooth'
+  });
   let currentZoom = map.getZoom();
   map.flyTo(markers[id].getLatLng(), Math.max(currentZoom, 8));
 }
