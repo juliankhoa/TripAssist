@@ -13,6 +13,7 @@ const categoryTagMap = {
 
 var currentContinent = null;
 var currentCategory = null;
+var currentSort = null;
 
 var markers = {};
 
@@ -60,22 +61,52 @@ function addDestinationsByContinent(continent) {
   let tagsFilter = $('#tagsSelect').val();
 
   $.getJSON(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${continent}?alt=json&key=${API_KEY}`, function(json) {
+    let filteredResults = [];
     $.each(json.values, function(idx, row) {
       if (row.length) {
         let id = self.crypto.randomUUID();
         let [name, coords, location, countryCode, description, tags, imgUrl] = row;
         if (!imgUrl) return;
 
-        if (countryFilter.length && !countryFilter.includes(countryCode)) return;
+        let countryName, parentName, parentCode;
+        let country = COUNTRIES[countryCode];
+        countryName = country.name;
+        if (country.parent) {
+          parentCode = country.parent;
+          parentName = COUNTRIES[parentCode].name;
+        }
+
+        if (countryFilter.length) {
+          let isFilteredCountry = countryFilter.includes(countryCode);
+          let isFilteredTerritory = countryFilter.includes(parentCode);
+          let isUnderFilter = isFilteredCountry || isFilteredTerritory;
+          if (!isUnderFilter) return;
+        }
 
         let tagsArr = tags.split(',').sort();
         if (!tagsFilter.length) tagsFilter = categoryTagMap[currentCategory];
         if (!tagsFilter.some(t => tagsArr.includes(t))) return;
 
-        let color = createDestinationCard(id, name, location, countryCode, description, tagsArr, imgUrl);
-        addDestinationMarker(id, name, color, coords);
+        filteredResults.push({
+          id: id,
+          name: name,
+          coords: coords,
+          location: location,
+          countryName: countryName,
+          countryCode: countryCode,
+          parentName: parentName,
+          parentCode: parentCode,
+          description: description,
+          tags: tagsArr,
+          imgUrl: imgUrl
+        });
       }
     });
+
+    for (let dest of filteredResults) {
+      let color = createDestinationCard(dest);
+      addDestinationMarker(dest.id, dest.name, color, dest.coords);
+    }
   });
 }
 
@@ -84,37 +115,31 @@ var CULTURAL_COLOR = '#0d6efd';
 var NATURAL_COLOR = '#198754';
 var MIXED_COLOR = '#137ba9';
 
-function createDestinationCard(id, name, location, countryCode, description, tagsArr, imgUrl) {
+function createDestinationCard(destination) {
   let template = $('#destinationCardTemplate').html();
-  $('#destinationList').prepend(template.replace('###', id));
+  $('#destinationList').prepend(template.replace('###', destination.id));
 
-  let parent = $('#' + id);
-  parent.find('.destination-name').html(name);
-  parent.find('.destination-description').html(description);
-  parent.find('.destination-img').attr('src', imgUrl);
-  parent.find('.primary-flag').attr('src', `assets/flags/${countryCode}.png`);
+  let parent = $('#' + destination.id);
+  parent.find('.destination-name').html(destination.name);
+  parent.find('.destination-description').html(destination.description);
+  parent.find('.destination-img').attr('src', destination.imgUrl);
+  parent.find('.primary-flag').attr('src', `assets/flags/${destination.countryCode}.png`);
 
   parent.click(function() {
-    focusOnDestination(id);
+    focusOnDestination(destination.id);
   });
 
-  let countryName, sovereignName;
-  $.each(COUNTRIES, function(idx, country) {
-    if (country.code == countryCode) countryName = country.name;
-    if (country.territories) {
-      if (country.territories.includes(countryCode)) {
-        parent.find('.secondary-flag').attr('src', `assets/flags/${country.code}.png`);
-        sovereignName = country.name;
-      }
-    }
-  });
-  if (sovereignName) countryName += ' (' + sovereignName + ')';
-  let locationStr = location ? `${location}, ${countryName}` : countryName;
+  let countryStr = destination.countryName;
+  if (destination.parentCode) {
+    countryStr += ' (' + destination.parentName + ')';
+    parent.find('.secondary-flag').attr('src', `assets/flags/${destination.parentCode}.png`);
+  }
+  let locationStr = destination.location ? `${destination.location}, ${countryStr}` : countryStr;
   parent.find('.destination-location').html(locationStr);
 
   let isCultural, isNatural = false;
   let tagsSection = parent.find('.tags-section');
-  for (let tag of tagsArr) {
+  for (let tag of destination.tags) {
     let badgeClass = 'secondary';
     if (CULTURAL_TAGS.includes(tag)) {
       isCultural = true;
@@ -198,11 +223,12 @@ function updateContinent(continent) {
   countrySelect.val(null);
 
   countrySelect.empty();
-  $.each(COUNTRIES, function(idx, country) {
+  for (let countryCode in COUNTRIES) {
+    let country = COUNTRIES[countryCode];
     if (country.continent == continent || continent == null) {
-      countrySelect.append(`<option value="${country.code}">${country.name}</option>`);
+      countrySelect.append(`<option value="${countryCode}">${country.name}</option>`);
     }
-  });
+  }
   updateDestinations();
 }
 
@@ -234,4 +260,8 @@ function updateCategory(category) {
     tagsSelect.append(`<option value="${tag}">${tag}</option>`);
   });
   updateDestinations();
+}
+
+function updateSort(sort) {
+  
 }
