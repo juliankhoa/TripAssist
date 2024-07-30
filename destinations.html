@@ -35,7 +35,7 @@
       <h5><i class="fa-solid fa-location-dot" style="color: #888"></i></h5>
       <div class="px-2">
         <!-- Location name display -->
-        <h5 class="destination-name mb-1">Destination Name</h5>
+        <h5 class="destination-title mb-1">Destination Name</h5>
         <!-- Location address display -->
         <p class="text-muted lh-1 mb-2"><small class="destination-location">City, Region</small></p>
         <p class="destination-description mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis augue nec ligula ultricies, quis scelerisque nibh venenatis.</p>
@@ -80,20 +80,20 @@
         <div class="row mb-3">
           <div class="d-flex justify-content-between align-items-center">
             <button type="button" class="btn btn-secondary" title="Hide" data-bs-dismiss="offcanvas"><i class="fa-solid fa-arrow-right"></i></button>
-            <h4 id="destinationsHeader" class="text-uppercase mt-2">All Destinations</h4>
+            <h4 class="text-uppercase mt-2"><span id="destinationsHeader">All Destinations</span> <ins id="destinationsNumber" class="text-muted">(0)</ins></h4>
 
             <div class="dropdown">
-              <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-arrow-down-wide-short"></i></button>
+              <button id="sortSelect" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-solid fa-arrow-down-wide-short fa-fw"></i></button>
               <ul class="dropdown-menu">
-                <li class="dropdown-item" style=""><i class="fa-solid fa-arrow-down-a-z fa-fw"></i> Name <span class="text-muted">(A–Z)<span></li>
-                <li class="dropdown-item"><i class="fa-solid fa-arrow-up-a-z fa-fw"></i> Name <span class="text-muted">(Z–A)<span></li>
-                <li class="dropdown-item" style=""><i class="fa-solid fa-arrow-down-1-9 fa-fw"></i> Coordinates <span class="text-muted">(SW–NE)<span></li>
-                <li class="dropdown-item"><i class="fa-solid fa-arrow-up-1-9 fa-fw"></i> Coordinates <span class="text-muted">(NE–SW)<span></li>
-                <li class="dropdown-item" style=""><i class="fa-solid fa-flag-usa fa-fw"></i> Country <span class="text-muted">(A-Z)<span></li>
-                <li class="dropdown-item"><i class="fa-solid fa-shuffle fa-fw"></i> Random</li>
+                <li class="dropdown-item" onclick="updateSort('a-z')"><i class="fa-solid fa-arrow-down-a-z fa-fw"></i> Name <span class="text-muted">(A–Z)<span></li>
+                <li class="dropdown-item" onclick="updateSort('z-a')"><i class="fa-solid fa-arrow-up-a-z fa-fw"></i> Name <span class="text-muted">(Z–A)<span></li>
+                <li class="dropdown-item" onclick="updateSort('n-s')"><i class="fa-solid fa-arrow-down-short-wide fa-fw"></i> Latitude <span class="text-muted">(N-S)<span></li>
+                <li class="dropdown-item" onclick="updateSort('s-n')"><i class="fa-solid fa-arrow-up-wide-short fa-fw"></i> Latitude <span class="text-muted">(S-N)<span></li>
+                <li class="dropdown-item" onclick="updateSort('w-e')"><i class="fa-solid fa-arrow-up-wide-short fa-rotate-90 fa-fw"></i> Longitude <span class="text-muted">(W-E)<span></li>
+                <li class="dropdown-item" onclick="updateSort('e-w')"><i class="fa-solid fa-arrow-down-short-wide fa-rotate-90 fa-fw"></i> Longitude <span class="text-muted">(E-W)<span></li>
+                <li class="dropdown-item" onclick="updateSort('random')"><i class="fa-solid fa-shuffle fa-fw"></i> Random</li>
               </ul>
             </div>
-
 
           </div>
         </div>
