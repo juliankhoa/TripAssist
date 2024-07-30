@@ -168,6 +168,12 @@ function createDestinationCard(destination) {
   parent.find('.destination-img').attr('src', destination.imgUrl);
   parent.find('.primary-flag').attr('src', `assets/flags/${destination.countryCode}.png`);
 
+  parent.mouseover(function() {
+    markers[destination.id].openTooltip();
+  });
+  parent.mouseleave(function() {
+    markers[destination.id].closeTooltip();
+  });
   parent.click(function() {
     focusOnDestination(destination.id);
   });
