@@ -92,6 +92,7 @@ function sortAndAddDestinations(destinations) {
       destinations.sort(() => Math.random() - 0.5);
       break;
     default:
+      destinations.reverse();
       break;
   }
   for (let dest of destinations) {
