@@ -53,6 +53,8 @@ function formatCountry(country) {
 }
 
 function updateDestinations() {
+  $('#destinationsNumber').html('<div class="spinner-border" style="width: 1.5rem; height: 1.5rem;"></div>');
+
   $('#destinationList').empty();
   markerLayer.clearLayers();
   markers = {};
