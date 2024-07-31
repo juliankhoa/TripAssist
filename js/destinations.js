@@ -11,10 +11,12 @@ const categoryTagMap = {
   'null': COMMON_TAGS.concat(CULTURAL_TAGS, NATURAL_TAGS).sort()
 };
 
+// Current filter/sort options
 var currentContinent = null;
 var currentCategory = null;
 var currentSort = null;
 
+var countryDestinationCount = {};
 var markers = {};
 
 var map = L.map('map').setView([20, 20], 3);
@@ -26,9 +28,10 @@ var markerLayer = L.layerGroup().addTo(map);
 
 $(function() {
   $('#showItineraryBtn').click();
-  updateContinent(null);
-  updateCategory(null);
-  updateSort(null);
+  populateCountrySelect();
+  populateTagsSelect();
+  updateSort('random');
+  $('#sortSelect').html('<i class="fa-solid fa-arrow-down-wide-short fa-fw">');
 
   $('#countrySelect').select2({
     placeholder: 'Select countries',
@@ -42,10 +45,19 @@ $(function() {
   }).on('change', updateDestinations);
 });
 
+function formatCountry(country) {
+  if (!country.id) {
+    return country.text;
+  }
+  return $(`<span><img src="assets/flags/${country.id}.png" class="select-flag" /> ${country.text}</span>`)
+}
+
 function updateDestinations() {
   $('#destinationList').empty();
   markerLayer.clearLayers();
   markers = {};
+
+  Object.keys(countryDestinationCount).forEach(c => delete countryDestinationCount[c]);
 
   if (currentContinent == null) {
     fetchAndFilterDestinations('Americas', []).then(async (destinations) => {
@@ -71,28 +83,34 @@ function sortAndAddDestinations(destinations) {
   $('#destinationsNumber').html('(' + destinations.length + ')');
   switch (currentSort) {
     case 'a-z':
-      destinations.sort((a, b) => b.title.localeCompare(a.title));
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || b.title.localeCompare(a.title));
       break;
     case 'z-a':
-      destinations.sort((a, b) => a.title.localeCompare(b.title));
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || a.title.localeCompare(b.title));
       break;
     case 'n-s':
-      destinations.sort((a, b) => a.lat - b.lat);
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || a.lat - b.lat);
       break;
     case 's-n':
-      destinations.sort((a, b) => b.lat - a.lat);
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || b.lat - a.lat);
       break;
     case 'w-e':
-      destinations.sort((a, b) => b.lon - a.lon);
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || b.lon - a.lon);
       break;
     case 'e-w':
-      destinations.sort((a, b) => a.lon - b.lon);
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || a.lon - b.lon);
+      break;
+    case '9-1':
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || countryDestinationCount[a.countryCode] - countryDestinationCount[b.countryCode]);
+      break;
+    case '1-9':
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || countryDestinationCount[b.countryCode] - countryDestinationCount[a.countryCode]);
       break;
     case 'random':
-      destinations.sort(() => Math.random() - 0.5);
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches || Math.random() - 0.5);
       break;
     default:
-      destinations.reverse();
+      destinations.sort((a, b) => a.tagMatches - b.tagMatches);
       break;
   }
   for (let dest of destinations) {
@@ -104,6 +122,10 @@ function sortAndAddDestinations(destinations) {
 async function fetchAndFilterDestinations(continent, destinations) {
   let countryFilter = $('#countrySelect').val();
   let tagsFilter = $('#tagsSelect').val();
+  let numTagsQueried = tagsFilter.length;
+
+  // If tags filter is empty, search for all tags under current category
+  if (!numTagsQueried) tagsFilter = categoryTagMap[currentCategory];
 
   let json = await $.getJSON(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${continent}?alt=json&key=${API_KEY}`);
   $.each(json.values, function(idx, row) {
@@ -125,11 +147,23 @@ async function fetchAndFilterDestinations(continent, destinations) {
         let isCountryMatch = countryFilter.includes(countryCode) || countryFilter.includes(parentCode);
         if (!isCountryMatch) return;
       }
-      // Filter by tags
+
+      // Count number of tag matches so we can sort by relevance
       let tagsArr = tags.split(',').sort();
-      // If tags filter is empty, search for all tags under current category
-      if (!tagsFilter.length) tagsFilter = categoryTagMap[currentCategory];
-      if (!tagsFilter.some(t => tagsArr.includes(t))) return;
+      let tagMatches = tagsFilter.filter(function(t) {
+        return tagsArr.indexOf(t) >= 0;
+      }).length;
+      // Filter by tags
+      if (tagMatches == 0) return;
+      // If tag filter was originally empty, do not consider tag relevance in sort
+      if (!numTagsQueried) tagMatches = 0;
+
+      if (countryDestinationCount.hasOwnProperty(countryCode)) {
+        countryDestinationCount[countryCode]++;
+      }
+      else {
+        countryDestinationCount[countryCode] = 1;
+      }
 
       let [lat, lon] = coords.split(',').map(function(c) {
         return c.trim();
@@ -147,6 +181,7 @@ async function fetchAndFilterDestinations(continent, destinations) {
         parentCode: parentCode,
         description: description,
         tags: tagsArr,
+        tagMatches: tagMatches,
         imgUrl: imgUrl
       });
     }
@@ -253,13 +288,6 @@ function focusOnDestination(id) {
   map.flyTo(markers[id].getLatLng(), Math.max(currentZoom, 8));
 }
 
-function formatCountry(country) {
-  if (!country.id) {
-    return country.text;
-  }
-  return $(`<span><img src="assets/flags/${country.id}.png" class="select-flag" /> ${country.text}</span>`)
-}
-
 // Update country filter
 function updateContinent(continent) {
   currentContinent = continent;
@@ -268,17 +296,22 @@ function updateContinent(continent) {
   let icon = continent == null ? 'globe' : 'earth-' + continent.toLowerCase();
   $('#continentSelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
 
+  populateCountrySelect();
+  updateDestinations();
+}
+
+// Populate country select with countries from currently selected continent
+function populateCountrySelect() {
   let countrySelect = $('#countrySelect');
   countrySelect.val(null);
-
   countrySelect.empty();
+
   for (let countryCode in COUNTRIES) {
     let country = COUNTRIES[countryCode];
-    if (country.continent == continent || continent == null) {
+    if (country.continent == currentContinent || currentContinent == null) {
       countrySelect.append(`<option value="${countryCode}">${country.name}</option>`);
     }
   }
-  updateDestinations();
 }
 
 // Update tags filter
@@ -301,14 +334,19 @@ function updateCategory(category) {
   $('#categorySelect').html(`<i class="fa-solid fa-${icon} fa-fw">`);
   $('#categorySelect').removeClass('btn-primary btn-secondary btn-success').addClass('btn-' + btnClass);
 
+  populateTagsSelect();
+  updateDestinations();
+}
+
+// Populate tags select with tags under currently selected category
+function populateTagsSelect() {
   let tagsSelect = $('#tagsSelect');
   tagsSelect.val(null);
-
   tagsSelect.empty();
-  $.each(categoryTagMap[category], function(idx, tag) {
+
+  $.each(categoryTagMap[currentCategory], function(idx, tag) {
     tagsSelect.append(`<option value="${tag}">${tag}</option>`);
   });
-  updateDestinations();
 }
 
 const SORT_ICONS = {
@@ -318,8 +356,9 @@ const SORT_ICONS = {
   's-n': 'arrow-up-wide-short',
   'w-e': 'arrow-up-wide-short fa-rotate-90',
   'e-w': 'arrow-down-short-wide fa-rotate-90',
-  'random': 'shuffle',
-  'null': 'arrow-down-wide-short'
+  '9-1': 'arrow-down-9-1',
+  '1-9': 'arrow-up-9-1',
+  'random': 'shuffle'
 };
 
 // Update sorting order
