@@ -81,38 +81,38 @@ function updateDestinations() {
 
 function sortAndAddDestinations(destinations) {
   $('#destinationsNumber').html('(' + destinations.length + ')');
+  let sortFunction = (a, b) => a.tagMatches - b.tagMatches;
   switch (currentSort) {
     case 'a-z':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || b.title.localeCompare(a.title));
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || b.title.localeCompare(a.title);
       break;
     case 'z-a':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || a.title.localeCompare(b.title));
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || a.title.localeCompare(b.title);
       break;
     case 'n-s':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || a.lat - b.lat);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || a.lat - b.lat;
       break;
     case 's-n':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || b.lat - a.lat);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || b.lat - a.lat;
       break;
     case 'w-e':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || b.lon - a.lon);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || b.lon - a.lon;
       break;
     case 'e-w':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || a.lon - b.lon);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || a.lon - b.lon;
       break;
     case '9-1':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || countryDestinationCount[a.countryCode] - countryDestinationCount[b.countryCode]);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || countryDestinationCount[a.countryCode] - countryDestinationCount[b.countryCode];
       break;
     case '1-9':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || countryDestinationCount[b.countryCode] - countryDestinationCount[a.countryCode]);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || countryDestinationCount[b.countryCode] - countryDestinationCount[a.countryCode];
       break;
     case 'random':
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches || Math.random() - 0.5);
-      break;
-    default:
-      destinations.sort((a, b) => a.tagMatches - b.tagMatches);
+      sortFunction = (a, b) => a.tagMatches - b.tagMatches || Math.random() - 0.5;
       break;
   }
+  destinations.sort(sortFunction);
+  
   for (let dest of destinations) {
     let color = createDestinationCard(dest);
     addDestinationMarker(dest.id, dest.title, color, dest.lat, dest.lon);
