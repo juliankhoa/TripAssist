@@ -524,7 +524,7 @@ const COUNTRIES = {
   },
   'JO': {
     name: 'Jordan',
-    continent: 'Africa'
+    continent: 'Asia'
   },
   'KZ': {
     name: 'Kazakhstan',
