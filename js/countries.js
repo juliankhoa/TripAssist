@@ -609,7 +609,7 @@ const COUNTRIES = {
   },
   'PT-30': {
     name: 'Madeira',
-    continent: 'Africa',
+    continent: 'Europe',
     parent: 'PT'
   },
   'MW': {
