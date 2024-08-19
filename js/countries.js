@@ -175,7 +175,7 @@ const COUNTRIES = {
   },
   'ES-CN': {
     name: 'Canary Islands',
-    continent: 'Africa',
+    continent: 'Europe',
     parent: 'ES'
   },
   'CV': {
@@ -395,7 +395,8 @@ const COUNTRIES = {
   },
   'GI': {
     name: 'Gibraltar',
-    continent: 'Europe'
+    continent: 'Europe',
+    parent: 'GB'
   },
   'GR': {
     name: 'Greece',
