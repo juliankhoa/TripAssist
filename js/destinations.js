@@ -119,6 +119,16 @@ function sortAndAddDestinations(destinations) {
     let color = createDestinationCard(dest);
     addDestinationMarker(dest.id, dest.title, color, dest.lat, dest.lon);
   }
+  // Fit map to markers
+  if (currentContinent || $('#countrySelect').val().length) {
+    let markersArr = [];
+    $.each(markers, function(idx, marker) {
+      markersArr.push(marker);
+    });
+    if (markersArr.length) {
+      map.fitBounds(L.featureGroup(markersArr).getBounds(), {paddingBottomRight: [500, 0]});
+    }
+  }
 }
 
 async function fetchAndFilterDestinations(continent, destinations) {
